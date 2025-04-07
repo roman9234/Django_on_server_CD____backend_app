@@ -1,0 +1,26 @@
+Для запуска через Gitlab:
+
+
+Установка раннера
+Регистрация раннера
+
+curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
+
+sudo apt install gitlab-runner
+
+sudo gitlab-runner register
+Вводим токен и url как указано при создании раннера в gitlab
+
+
+gitlab-runner run
+//Проверка статуса
+sudo gitlab-runner status
+
+
+
+Добавляем переменные в Variables
+SSH_PRIVATE_KEY
+SERVER_HOST
+
+
+
