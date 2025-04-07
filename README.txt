@@ -32,7 +32,7 @@ sudo nginx -t
 
 
 
-
+curl http://localhost:8000/
 
 
 

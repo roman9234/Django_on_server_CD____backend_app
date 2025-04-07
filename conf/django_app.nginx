@@ -1,5 +1,5 @@
 server {
-    listen 8000;
+    listen 80;
     server_name 89.111.141.9;
 
     location /static/ {
@@ -8,6 +8,6 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://localhost:80;
+        proxy_pass http://localhost:8000;
     }
 }
