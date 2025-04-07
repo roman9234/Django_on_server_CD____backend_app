@@ -26,7 +26,7 @@ sudo ln -s /opt/django_app/conf/myapp.nginx /etc/nginx/sites-available/
 
 sudo ln -s /etc/nginx/sites-available/myapp.nginx /etc/nginx/sites-enabled/
 
-cat /etc/nginx/sites-enabled/myapp.nginx
+cat /etc/nginx/sites-enabled/django_app.nginx
 
 sudo nginx -t
 
