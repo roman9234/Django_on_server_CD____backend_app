@@ -48,3 +48,6 @@ deploy_to_vps:
   only:
     # Условия запуска пайплайна
     - main
+
+  rules:
+      - if: $CI_COMMIT_BRANCH == 'staging' && $CI_COMMIT_REF_PROTECTED == 'true'
