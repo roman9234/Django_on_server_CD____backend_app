@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 #  push:
 #    branches:
-#      - main  # Укажите ветку, при пуше в которую будет запускаться деплой
+#      - main
 
 
 jobs:
@@ -25,13 +25,13 @@ jobs:
     # Копируем файлы на сервер
     - name: Copy files to server
       run: |
-        rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@${{ secrets.SERVER_HOST }}:/path/to/your/project/
+        rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@${{ secrets.SERVER_HOST }}:/opt/django_app/
 
     # Выполняем команды на сервере для деплоя
     - name: Deploy on server
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
-          cd /path/to/your/project/
+          cd /opt/django_app/
           docker-compose down
           docker-compose pull
           docker-compose up -d --build
