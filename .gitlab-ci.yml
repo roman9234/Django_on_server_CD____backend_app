@@ -18,7 +18,7 @@ cleanup_server:
     # Удаляем содержимое /opt/ на сервере
     - ssh root@$SERVER_HOST << 'EOF'
         set -e &&
-        rm -rf /opt/* &&
+        sudo rm -rf /opt/* &&
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
