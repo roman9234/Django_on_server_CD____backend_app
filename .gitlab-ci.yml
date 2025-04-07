@@ -1,53 +1,71 @@
 stages:
+  - cleanup
   - deploy
+  - nginx
 
-deploy_to_vps:
-  stage: deploy
+cleanup_server:
+  stage: cleanup
   tags:
-    # Тэг раннера
     - shell
   script:
-    # SSH доступ
+    # Удаляем содержимое /opt/ на сервере
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
-
-    # Очистка рабочего репозитория
     - ssh root@$SERVER_HOST << 'EOF'
         rm -rf /opt/*
       EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - if: '$CI_PIPELINE_SOURCE == "push"'
 
-    # Копируем файлы на сервер
-    - rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
-
-    # Деплой докер контейнера
+deploy_application:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    # Копируем файлы на сервер и деплоим приложение
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
         sudo mkdir -p /opt/django_app_static/
         sudo mkdir -p /opt/django_app_data/
         cd /opt/django_app/
-        docker-compose down
-        docker-compose pull
-        docker-compose up -d --build
+        docker-compose down || exit 1
+        docker-compose pull || exit 1
+        docker-compose up -d --build || exit 1
       EOF
-
-    # Запуск Nginx
-    - ssh root@$SERVER_HOST << 'EOF'
-        sudo apt install -y nginx
-        sudo rm /etc/nginx/sites-enabled/default
-        rm /etc/nginx/sites-available/django_app.nginx || true
-        rm /etc/nginx/sites-enabled/django_app.nginx || true
-        sudo ln -s /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
-        sudo ln -s /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
-        cat /etc/nginx/sites-enabled/django_app.nginx
-        sudo nginx -t
-        sudo systemctl restart nginx
-      EOF
-
   rules:
-    # Условие запуска Job - только для ветки main
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
-    # Только при пуше
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+configure_nginx:
+  stage: nginx
+  tags:
+    - shell
+  script:
+    # Настраиваем Nginx
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - ssh root@$SERVER_HOST << 'EOF'
+        sudo apt install -y nginx || exit 1
+        sudo rm /etc/nginx/sites-enabled/default || true
+        sudo ln -sf /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
+        sudo ln -sf /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
+        cat /etc/nginx/sites-enabled/django_app.nginx || exit 1
+        sudo nginx -t || exit 1
+        sudo systemctl restart nginx || exit 1
+      EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
