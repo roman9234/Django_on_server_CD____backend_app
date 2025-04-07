@@ -31,8 +31,24 @@ jobs:
     - name: Deploy on server
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
+          sudo mkdir -p /opt/django_app_static/
+          sudo mkdir -p /opt/django_app_data/
           cd /opt/django_app/
           docker-compose down
           docker-compose pull
           docker-compose up -d --build
+          curl http://localhost:8000
+        EOF
+
+    # Запуск Nginx
+    - name: Configure Nginx
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
+          sudo apt install -y nginx
+          sudo rm /etc/nginx/sites-enabled/default
+          sudo ln -s /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
+          sudo ln -s /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
+          cat /etc/nginx/sites-enabled/django_app.nginx
+          sudo nginx -t
+          sudo systemctl restart nginx
         EOF

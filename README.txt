@@ -15,6 +15,29 @@ SSH_PRIVATE_KEY
 SERVER_HOST
 
 
+//Убираем конфигурационный файлик по умолчанию Nginx
+//Сделаем симулинк к нашим настройкам
+//Теперь сделаем из него симулинк в enabled
+//Конфигурацию подложили в каталог настроек Nginx, она должна сработать
+//Проверим что nginx не видит в конфигурации ошибку, и синтаксис корректен
+sudo rm /etc/nginx/sites-enabled/default
+
+sudo ln -s /opt/django_app/conf/myapp.nginx /etc/nginx/sites-available/
+
+sudo ln -s /etc/nginx/sites-available/myapp.nginx /etc/nginx/sites-enabled/
+
+cat /etc/nginx/sites-enabled/myapp.nginx
+
+sudo nginx -t
+
+
+
+
+
+
+
+
+
 
 Если мы хотим собирать докер образ и деплоить на сервер с помощью GitHub Actions,
 можем самостоятельно повыбирать и шаблонов во вкладке Actions
