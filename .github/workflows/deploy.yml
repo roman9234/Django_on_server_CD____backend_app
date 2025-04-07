@@ -1,0 +1,38 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - main  # Укажите ветку, при пуше в которую будет запускаться деплой
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Клонируем репозиторий
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Устанавливаем SSH доступ
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    # Копируем файлы на сервер
+    - name: Copy files to server
+      run: |
+        rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@${{ secrets.SERVER_HOST }}:/path/to/your/project/
+
+    # Выполняем команды на сервере для деплоя
+    - name: Deploy on server
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
+          cd /path/to/your/project/
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d --build
+        EOF
