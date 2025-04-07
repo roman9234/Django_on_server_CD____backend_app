@@ -18,12 +18,14 @@ jobs:
 
     # Устанавливаем SSH доступ
     - name: Setup SSH
+      if: ${{ success() }}
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     # Очистка рабочего репозитория
     - name: Clear working repo
+      if: ${{ success() }}
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
           rm -rf /opt/*
@@ -31,11 +33,13 @@ jobs:
 
     # Копируем файлы на сервер
     - name: Copy files to server
+      if: ${{ success() }}
       run: |
         rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@${{ secrets.SERVER_HOST }}:/opt/django_app/
 
     # Выполняем команды на сервере для деплоя
     - name: Deploy Docker container
+      if: ${{ success() }}
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
           sudo mkdir -p /opt/django_app_static/
@@ -48,6 +52,7 @@ jobs:
 
     # Запуск Nginx
     - name: Configure Nginx
+      if: ${{ success() }}
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
           sudo apt install -y nginx
