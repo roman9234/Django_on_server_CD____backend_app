@@ -14,9 +14,9 @@ cleanup_server:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST "
         rm -rf /opt/*
-      EOF
+      "
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
@@ -34,14 +34,14 @@ deploy_application:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST "
         sudo mkdir -p /opt/django_app_static/
         sudo mkdir -p /opt/django_app_data/
         cd /opt/django_app/
         docker-compose down || exit 1
         docker-compose pull || exit 1
         docker-compose up -d --build || exit 1
-      EOF
+      "
 
 configure_nginx:
   stage: nginx
@@ -54,7 +54,7 @@ configure_nginx:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST "
         sudo apt install -y nginx || exit 1
         sudo rm /etc/nginx/sites-enabled/default || true
         sudo ln -sf /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
@@ -62,4 +62,4 @@ configure_nginx:
         cat /etc/nginx/sites-enabled/django_app.nginx || exit 1
         sudo nginx -t || exit 1
         sudo systemctl restart nginx || exit 1
-      EOF
+      "
