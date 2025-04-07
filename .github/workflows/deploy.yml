@@ -22,13 +22,20 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    # Очистка рабочего репозитория
+    - name: Clear working repo
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
+          rm -rf /opt/*
+        EOF
+
     # Копируем файлы на сервер
     - name: Copy files to server
       run: |
         rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@${{ secrets.SERVER_HOST }}:/opt/django_app/
 
     # Выполняем команды на сервере для деплоя
-    - name: Deploy on server
+    - name: Deploy Docker container
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
           sudo mkdir -p /opt/django_app_static/
@@ -45,6 +52,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} << 'EOF'
           sudo apt install -y nginx
           sudo rm /etc/nginx/sites-enabled/default
+          rm /etc/nginx/sites-available/django_app.nginx
+          rm /etc/nginx/sites-enabled/django_app.nginx
           sudo ln -s /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
           sudo ln -s /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
           cat /etc/nginx/sites-enabled/django_app.nginx
