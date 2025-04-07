@@ -45,6 +45,9 @@ deploy_to_vps:
         sudo systemctl restart nginx
       EOF
 
-  only:
-    # Условия запуска пайплайна
-    - main
+  rules:
+    # Условие запуска Job - только для ветки main
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    # Только при пуше
+    - if: '$CI_PIPELINE_SOURCE == "push"'
