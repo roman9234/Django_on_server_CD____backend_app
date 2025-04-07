@@ -38,9 +38,9 @@ deploy_application:
         sudo mkdir -p /opt/django_app_static/
         sudo mkdir -p /opt/django_app_data/
         cd /opt/django_app/
-        docker-compose down || exit 1
-        docker-compose pull || exit 1
-        docker-compose up -d --build || exit 1
+        docker-compose down
+        docker-compose pull
+        docker-compose up -d --build
       "
 
 configure_nginx:
@@ -55,11 +55,11 @@ configure_nginx:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
     - ssh root@$SERVER_HOST "
-        sudo apt install -y nginx || exit 1
-        sudo rm /etc/nginx/sites-enabled/default || true
+        sudo apt install -y nginx
+        sudo rm /etc/nginx/sites-enabled/default
         sudo ln -sf /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
         sudo ln -sf /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
-        cat /etc/nginx/sites-enabled/django_app.nginx || exit 1
-        sudo nginx -t || exit 1
-        sudo systemctl restart nginx || exit 1
+        cat /etc/nginx/sites-enabled/django_app.nginx
+        sudo nginx -t
+        sudo systemctl restart nginx
       "
