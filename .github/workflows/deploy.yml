@@ -37,7 +37,6 @@ jobs:
           docker-compose down
           docker-compose pull
           docker-compose up -d --build
-          curl http://localhost:8000
         EOF
 
     # Запуск Nginx
