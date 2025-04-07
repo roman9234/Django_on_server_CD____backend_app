@@ -2,10 +2,6 @@ stages:
   - deploy
 
 deploy_to_vps:
-
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'staging' && $CI_COMMIT_REF_PROTECTED == 'true'
-
   stage: deploy
   tags:
     # Тэг раннера
@@ -49,3 +45,6 @@ deploy_to_vps:
         sudo systemctl restart nginx
       EOF
 
+  only:
+    # Условия запуска пайплайна
+    - main
