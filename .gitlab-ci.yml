@@ -16,9 +16,10 @@ cleanup_server:
     - shell
   script:
     # Удаляем содержимое /opt/ на сервере
-    - ssh root@$SERVER_HOST "
+    - ssh root@$SERVER_HOST << 'EOF'
+        set -e
         rm -rf /opt/*
-        "
+      EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
@@ -31,14 +32,15 @@ deploy_application:
   script:
     # Копируем файлы на сервер и деплоим приложение
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
-    - ssh root@$SERVER_HOST "
+    - ssh root@$SERVER_HOST << 'EOF'
+        set -e
         sudo mkdir -p /opt/django_app_static/
         sudo mkdir -p /opt/django_app_data/
         cd /opt/django_app/
-        docker-compose down || exit 1
-        docker-compose pull || exit 1
-        docker-compose up -d --build || exit 1
-        "
+        docker-compose down
+        docker-compose pull
+        docker-compose up -d --build
+      EOF
 
 configure_nginx:
   stage: nginx
@@ -46,12 +48,13 @@ configure_nginx:
     - shell
   script:
     # Настраиваем Nginx
-    - ssh root@$SERVER_HOST "
-        sudo apt install -y nginx || exit 1
-        sudo rm /etc/nginx/sites-enabled/default || true
+    - ssh root@$SERVER_HOST << 'EOF'
+        set -e
+        sudo apt install -y nginx
+        sudo rm /etc/nginx/sites-enabled/default
         sudo ln -sf /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
         sudo ln -sf /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
-        cat /etc/nginx/sites-enabled/django_app.nginx || exit 1
-        sudo nginx -t || exit 1
-        sudo systemctl restart nginx || exit 1
-        "
+        cat /etc/nginx/sites-enabled/django_app.nginx
+        sudo nginx -t
+        sudo systemctl restart nginx
+      EOF
