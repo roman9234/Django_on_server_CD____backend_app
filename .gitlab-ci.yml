@@ -38,6 +38,7 @@ build_application:
         sudo mkdir -p /opt/django_app_static/ &&
         sudo mkdir -p /opt/django_app_data/ &&
         cd /opt/django_app/ &&
+        docker:dind &&
         docker-compose down &&
         docker-compose pull &&
         docker-compose build
@@ -51,6 +52,7 @@ deploy_application:
     # Запскаем контейнер
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
+        docker:dind &&
         docker-compose up -d
       EOF
 
