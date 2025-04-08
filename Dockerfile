@@ -25,6 +25,8 @@ RUN pip install -r requirements.txt
 # Монжо добавить переменную при инициализации контейнера
 ENV PYTHONUNBUFFERED=1
 
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
 
 #Применение миграций
 #Через оболочку sh вызываем скрипт

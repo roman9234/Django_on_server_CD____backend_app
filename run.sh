@@ -13,7 +13,8 @@ DJANGO_SUPERUSER_USERNAME="admin" \
 
 #Запуск приложения
 #noreload чтобы Django не отслеживал изменения файлов в проекте для перезапуска
-python manage.py runserver --noreload 0.0.0.0:8000
+#python manage.py runserver --noreload 0.0.0.0:8000
+python /wait-for-it.sh app-postgres:5432 -- python manage.py runserver 0.0.0.0:8000
 
 
 
