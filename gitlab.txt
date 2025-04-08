@@ -46,3 +46,7 @@ docker-compose up -d
 
 
 EOF и все команды SSH стоит прописывать также как и предыдущие - через дефис
+
+
+Стоит убрать строчку, иначе gitlab runner попытается найти image которого нет
+image: django-app-docker-compose
