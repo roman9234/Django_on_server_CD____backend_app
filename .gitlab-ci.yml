@@ -54,6 +54,7 @@ deploy_application:
     - cd /opt/django_app/
     - docker compose up -d
     - EOF
+    - exit
 
 configure_nginx:
   stage: nginx
