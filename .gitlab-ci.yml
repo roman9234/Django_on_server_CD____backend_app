@@ -1,5 +1,6 @@
 stages:
   - cleanup
+  - build
   - deploy
   - nginx
 
@@ -25,12 +26,12 @@ cleanup_server:
       when: on_success
     - if: '$CI_PIPELINE_SOURCE == "push"'
 
-deploy_application:
-  stage: deploy
+build_application:
+  stage: build
   tags:
     - shell
   script:
-    # Копируем файлы на сервер и деплоим приложение
+    # Собираем контейнер, чтобы
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
         set -e &&
@@ -39,7 +40,18 @@ deploy_application:
         cd /opt/django_app/ &&
         docker-compose down &&
         docker-compose pull &&
-        docker-compose up -d --build
+        docker-compose build
+      EOF
+
+deploy_application:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    # Запскаем контейнер
+    - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
+    - ssh root@$SERVER_HOST << 'EOF'
+        docker-compose up -d
       EOF
 
 configure_nginx:

@@ -34,4 +34,15 @@ sudo -u gitlab-runner -i
 sudo whoami
 Должно вывести root
 
+Также нужно прописать команду чтобы gitlab-runner могу работать с контейнерами
+sudo usermod -aG docker gitlab-runner
+
+Кроме того нужно рахделить стадии сборки контейнера и запуска, иначе моугт возникнуть ошибки
+То есть команду ниже нужно разделить:
+docker-compose up -d --build
+разделение:
+docker-compose build
+docker-compose up -d
+
+
 
