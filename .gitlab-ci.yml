@@ -34,12 +34,12 @@ build_application:
     # Собираем контейнер, чтобы
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
-        set -e
-        sudo mkdir -p /opt/django_app_static/
-        sudo mkdir -p /opt/django_app_data/
-        cd /opt/django_app/
-        docker-compose down
-        docker-compose pull
+        set -e &&
+        sudo mkdir -p /opt/django_app_static/ &&
+        sudo mkdir -p /opt/django_app_data/ &&
+        cd /opt/django_app/ &&
+        docker-compose down &&
+        docker-compose pull &&
         docker-compose build
       EOF
 
@@ -51,7 +51,7 @@ deploy_application:
     # Запскаем контейнер
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
-        cd /opt/django_app/
+        cd /opt/django_app/ &&
         docker-compose up -d
       EOF
 
