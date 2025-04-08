@@ -17,6 +17,9 @@ gitlab-runner run
 //Проверка статуса
 sudo gitlab-runner status
 
+sudo systemctl restart gitlab-runner
+systemctl daemon-reload
+
 
 
 Добавляем переменные в Variables
@@ -51,3 +54,6 @@ EOF и все команды SSH стоит прописывать также к
 
 Стоит убрать строчку, иначе gitlab runner попытается найти image которого нет
 image: django-app-docker-compose
+
+
+ssh -i C:/SWEB/id_rsa root@89.111.141.9 << 'EOF'
