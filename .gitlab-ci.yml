@@ -18,7 +18,7 @@ cleanup_server:
     # Удаляем содержимое /opt/ на сервере
     - ssh root@$SERVER_HOST << 'EOF'
         set -e &&
-        sudo rm -rf /opt/* &&
+        sudo rm -rf /opt/*
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -39,7 +39,7 @@ deploy_application:
         cd /opt/django_app/ &&
         docker-compose down &&
         docker-compose pull &&
-        docker-compose up -d --build &&
+        docker-compose up -d --build
       EOF
 
 configure_nginx:
@@ -56,5 +56,5 @@ configure_nginx:
         sudo ln -sf /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/ &&
         cat /etc/nginx/sites-enabled/django_app.nginx &&
         sudo nginx -t &&
-        sudo systemctl restart nginx &&
+        sudo systemctl restart nginx
       EOF

@@ -24,3 +24,14 @@ SERVER_HOST
 
 
 
+Нужно настроить файл SUDOERS на сервере, чтобы пользователь gitlab-runner мог использовать команду sudo без пароля:
+sudo visudo
+Добавляем в конец файла:
+gitlab-runner ALL=(ALL) NOPASSWD:ALL
+
+Проверка разрешений:
+sudo -u gitlab-runner -i
+sudo whoami
+Должно вывести root
+
+
