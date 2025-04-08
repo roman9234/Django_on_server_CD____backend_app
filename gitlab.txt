@@ -9,6 +9,7 @@ curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/sc
 sudo apt install gitlab-runner
 
 sudo gitlab-runner register
+
 Вводим токен и url как указано при создании раннера в gitlab
 
 
