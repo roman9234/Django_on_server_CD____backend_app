@@ -15,7 +15,6 @@ COPY ./django_project .
 #Помимо прилозения нам понадобится файлик
 COPY ./requirements.txt .
 
-
 #Файл нужный для применения миграций
 COPY ./run.sh .
 
