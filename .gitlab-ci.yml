@@ -20,8 +20,7 @@ cleanup_server:
     - ssh root@$SERVER_HOST << 'EOF'
         set -e
         sudo rm -rf /opt/*
-EOF
-
+      EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
@@ -42,7 +41,7 @@ build_application:
         docker-compose down
         docker-compose pull
         docker-compose build
-EOF
+      EOF
 
 deploy_application:
   stage: deploy
@@ -52,8 +51,9 @@ deploy_application:
     # Запскаем контейнер
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
     - ssh root@$SERVER_HOST << 'EOF'
+        cd /opt/django_app/
         docker-compose up -d
-EOF
+      EOF
 
 configure_nginx:
   stage: nginx
@@ -70,4 +70,4 @@ configure_nginx:
         cat /etc/nginx/sites-enabled/django_app.nginx &&
         sudo nginx -t &&
         sudo systemctl restart nginx
-EOF
+      EOF
