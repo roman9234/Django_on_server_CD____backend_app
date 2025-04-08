@@ -64,7 +64,7 @@ configure_nginx:
     - ssh root@$SERVER_HOST << 'EOF'
     - set -e
     - sudo apt install -y nginx
-    - sudo rm /etc/nginx/sites-enabled/default
+    - sudo rm -f /etc/nginx/sites-enabled/default
     - sudo ln -sf /opt/django_app/conf/django_app.nginx /etc/nginx/sites-available/
     - sudo ln -sf /etc/nginx/sites-available/django_app.nginx /etc/nginx/sites-enabled/
     - cat /etc/nginx/sites-enabled/django_app.nginx
