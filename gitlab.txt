@@ -45,6 +45,4 @@ docker-compose build
 docker-compose up -d
 
 
-docker:dind
-
-после EOF пробел
+EOF и все команды SSH стоит прописывать также как и предыдущие - через дефис
