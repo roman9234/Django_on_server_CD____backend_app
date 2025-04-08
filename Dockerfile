@@ -15,10 +15,6 @@ COPY ./django_project .
 #Помимо прилозения нам понадобится файлик
 COPY ./requirements.txt .
 
-# Добавляем разрешение на запуск run.sh
-RUN chmod +x run.sh
-
-
 
 #Файл нужный для применения миграций
 COPY ./run.sh .
