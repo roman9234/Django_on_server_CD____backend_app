@@ -17,12 +17,11 @@ prepare_server:
     - shell
   script:
     # Удаляем содержимое /opt/ на сервере
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST
     - sudo apt update
     - sudo apt install -y python3-pip nginx -y
     - set -e
     - sudo rm -rf /opt/*
-    - EOF
     - exit
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -36,7 +35,7 @@ build_application:
   script:
     # Собираем контейнер, чтобы
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST
     - set -e
     - sudo mkdir -p /opt/django_app_static/
     - sudo mkdir -p /opt/django_app_data/
@@ -44,7 +43,6 @@ build_application:
     - docker compose down
     - docker build -t django-app-docker-compose .
     - docker compose build --no-cache
-    - EOF
     - exit
 
 deploy_application:
@@ -54,10 +52,9 @@ deploy_application:
   script:
     # Запскаем контейнер
     - rsync -avz --exclude='*.log' --exclude='tmp/' -e "ssh -o StrictHostKeyChecking=no" ./ root@$SERVER_HOST:/opt/django_app/
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST
     - cd /opt/django_app/
     - docker compose up -d
-    - EOF
     - exit
 
 configure_nginx:
@@ -66,7 +63,7 @@ configure_nginx:
     - shell
   script:
     # Настраиваем Nginx
-    - ssh root@$SERVER_HOST << 'EOF'
+    - ssh root@$SERVER_HOST
     - set -e
     - sudo apt install -y nginx
     - sudo rm -f /etc/nginx/sites-enabled/default
@@ -75,5 +72,4 @@ configure_nginx:
     - cat /etc/nginx/sites-enabled/django_app.nginx
     - sudo nginx -t
     - sudo systemctl restart nginx
-    - EOF
     - exit
