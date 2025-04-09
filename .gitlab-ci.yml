@@ -23,6 +23,7 @@ prepare_server:
     - set -e
     - sudo rm -rf /opt/*
     - EOF
+    - exit
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
@@ -44,6 +45,7 @@ build_application:
     - docker build -t django-app-docker-compose .
     - docker compose build --no-cache
     - EOF
+    - exit
 
 deploy_application:
   stage: deploy
@@ -56,6 +58,7 @@ deploy_application:
     - cd /opt/django_app/
     - docker compose up -d
     - EOF
+    - exit
 
 configure_nginx:
   stage: nginx
@@ -73,3 +76,4 @@ configure_nginx:
     - sudo nginx -t
     - sudo systemctl restart nginx
     - EOF
+    - exit
